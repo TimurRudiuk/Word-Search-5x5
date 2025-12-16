@@ -33,6 +33,7 @@ function Grid({ onComplete, gameSettings, onMainMenu }) {
   return (
     <div className="grid-container">
       <h2>Word Search Game</h2>
+      <p>Grid: {gridSize}×{gridSize}, Words: {totalWords}</p>
       
       <div className="game-grid" style={{
         display: 'grid',
