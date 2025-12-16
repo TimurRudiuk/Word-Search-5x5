@@ -1,20 +1,24 @@
 import Grid from "../../components/Grid/Grid";
+import { useParams } from "react-router-dom";
 
 function GamePage({ onFinish, gameSettings, onMainMenu }) {
+  const { userId } = useParams();
+
   const handleGameComplete = (results) => {
     onFinish(results);
   };
 
-  const gridKey = gameSettings 
+  const gridKey = gameSettings
     ? `${gameSettings.gridSize}-${gameSettings.wordCount}`
     : "default";
 
   return (
     <div className="page">
       <div className="game-container">
-        <Grid 
+
+        <Grid
           key={gridKey}
-          onComplete={handleGameComplete} 
+          onComplete={handleGameComplete}
           gameSettings={gameSettings}
           onMainMenu={onMainMenu}
         />

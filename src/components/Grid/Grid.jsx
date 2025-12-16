@@ -4,8 +4,6 @@ import Button from "../Button/Button";
 import "./Grid.css";
 
 function Grid({ onComplete, gameSettings, onMainMenu }) {
-  console.log("Grid - gameSettings:", gameSettings);
-  
   const {
     initialGrid,
     placedWords,
@@ -23,11 +21,6 @@ function Grid({ onComplete, gameSettings, onMainMenu }) {
     gridSize
   } = useWordSearch(onComplete, gameSettings);
 
-  console.log("Grid - initialGrid:", initialGrid);
-  console.log("Grid - initialGrid length:", initialGrid?.length);
-  console.log("Grid - gridSize:", gridSize);
-  console.log("selectedCells is function?", typeof selectedCells === 'function');
-
   if (!initialGrid || initialGrid.length === 0) {
     return (
       <div className="grid-container">
@@ -40,6 +33,7 @@ function Grid({ onComplete, gameSettings, onMainMenu }) {
   return (
     <div className="grid-container">
       <h2>Word Search Game</h2>
+      
       <div className="game-grid" style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
