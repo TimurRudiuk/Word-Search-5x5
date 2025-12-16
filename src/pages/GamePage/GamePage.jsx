@@ -1,22 +1,24 @@
 import Grid from "../../components/Grid/Grid";
-import Button from "../../components/Button/Button";
 
-function GamePage({ onFinish }) {
+function GamePage({ onFinish, gameSettings, onMainMenu }) {
   const handleGameComplete = (results) => {
     onFinish(results);
   };
 
-  const handleManualFinish = () => {
-    onFinish({ found: 0, total: 0 });
-  };
+  const gridKey = gameSettings 
+    ? `${gameSettings.gridSize}-${gameSettings.wordCount}`
+    : "default";
 
   return (
     <div className="page">
-      
       <div className="game-container">
-        <Grid onComplete={handleGameComplete} />
+        <Grid 
+          key={gridKey}
+          onComplete={handleGameComplete} 
+          gameSettings={gameSettings}
+          onMainMenu={onMainMenu}
+        />
       </div>
-
     </div>
   );
 }

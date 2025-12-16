@@ -3,12 +3,14 @@ import Cell from "../Cell/Cell";
 import Button from "../Button/Button";
 import "./Grid.css";
 
-function Grid({ onComplete }) {
+function Grid({ onComplete, gameSettings, onMainMenu }) {
+  console.log("Grid - gameSettings:", gameSettings);
+  
   const {
     initialGrid,
     placedWords,
-    selectedCells,
-    foundCells,
+    selectedCells, 
+    foundCells,    
     isCellLastSelected,
     getCellOrder,
     foundWords,
@@ -19,12 +21,25 @@ function Grid({ onComplete }) {
     handleClear,
     selectedSequence,
     gridSize
-  } = useWordSearch(onComplete);
+  } = useWordSearch(onComplete, gameSettings);
+
+  console.log("Grid - initialGrid:", initialGrid);
+  console.log("Grid - initialGrid length:", initialGrid?.length);
+  console.log("Grid - gridSize:", gridSize);
+  console.log("selectedCells is function?", typeof selectedCells === 'function');
+
+  if (!initialGrid || initialGrid.length === 0) {
+    return (
+      <div className="grid-container">
+        <h2>Loading grid...</h2>
+        <p>Grid size: {gridSize}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid-container">
       <h2>Word Search Game</h2>
-      
       <div className="game-grid" style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
@@ -37,7 +52,7 @@ function Grid({ onComplete }) {
             <Cell
               key={`${rowIndex}-${colIndex}`}
               letter={letter}
-              selected={selectedCells(rowIndex, colIndex)}
+              selected={selectedCells(rowIndex, colIndex)} 
               lastSelected={isCellLastSelected(rowIndex, colIndex)}
               found={foundCells[rowIndex][colIndex]}
               order={getCellOrder(rowIndex, colIndex)}
@@ -75,8 +90,8 @@ function Grid({ onComplete }) {
           />
           <Button 
             text="Main Menu" 
-            onClick={() => window.location.reload()} 
-            danger
+            onClick={onMainMenu} 
+            secondary
           />
         </div>
       </div>
@@ -108,11 +123,10 @@ function Grid({ onComplete }) {
               ))}
             </div>
           ) : (
-            <p className="no-found"></p>
+            <p className="no-found">No words found yet</p>
           )}
         </div>
       </div>
-
     </div>
   );
 }
