@@ -1,0 +1,11 @@
+.page {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0;
+}
