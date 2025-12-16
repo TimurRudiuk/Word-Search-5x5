@@ -18,8 +18,6 @@ const WORD_POOL = [
 ];
 
 function generateGrid(gridSize, wordCount) {
-  console.log(`Generating ${gridSize}x${gridSize} grid with ${wordCount} words`);
-  
   const grid = Array(gridSize).fill(null).map(() => 
     Array(gridSize).fill("")
   );
@@ -169,7 +167,6 @@ const areCellsConsecutiveInLine = (sequence) => {
 };
 
 export function useWordSearch(onComplete, gameSettings) {
-  console.log("useWordSearch called with:", gameSettings);
   
   const settings = gameSettings || {
     gridSize: 5,
@@ -181,7 +178,6 @@ export function useWordSearch(onComplete, gameSettings) {
   if (!gridDataRef.current || 
       gridDataRef.current.gridSize !== settings.gridSize || 
       gridDataRef.current.wordCount !== settings.wordCount) {
-    console.log("Creating new grid data");
     gridDataRef.current = {
       ...generateGrid(settings.gridSize, settings.wordCount),
       gridSize: settings.gridSize,

@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+
 import StartPage from "./pages/StartPage/StartPage";
 import GamePage from "./pages/GamePage/GamePage";
 import GameCompleteModal from "./components/GameCompleteModal/GameCompleteModal";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("start");
+  const navigate = useNavigate();
+
   const [gameResults, setGameResults] = useState({
     found: 0,
     total: 0
@@ -13,52 +16,49 @@ function App() {
   const [showGameComplete, setShowGameComplete] = useState(false);
 
   const handleGoToStart = () => {
-    setCurrentPage("start");
     setGameSettings(null);
     setShowGameComplete(false);
+    navigate("/");
   };
 
   const handleStartGame = (settings) => {
-    console.log("Starting game with settings:", settings); 
     setGameSettings(settings);
     setGameResults({ found: 0, total: 0 });
-    setCurrentPage("game");
     setShowGameComplete(false);
+
+    const userId = Date.now();
+    navigate(`/game/${userId}`);
   };
 
   const handleFinishGame = (results) => {
-    console.log("Game finished with results:", results); 
     setGameResults(results);
     setShowGameComplete(true);
   };
 
   const handleRestartGame = () => {
-    console.log("Restarting game with same settings"); 
     setShowGameComplete(false);
-    setCurrentPage("game");
   };
-
-  let currentComponent;
-  
-  switch (currentPage) {
-    case "start":
-      currentComponent = <StartPage onStart={handleStartGame} />;
-      break;
-    case "game":
-      currentComponent = <GamePage 
-      onFinish={handleFinishGame} 
-      gameSettings={gameSettings}
-      onMainMenu={handleGoToStart}  
-      />;
-      break;
-    default:
-      currentComponent = <StartPage onStart={handleStartGame} />;
-  }
 
   return (
     <div className="App">
-      {currentComponent}
-      
+      <Routes>
+        <Route
+          path="/"
+          element={<StartPage onStart={handleStartGame} />}
+        />
+
+        <Route
+          path="/game/:userId"
+          element={
+            <GamePage
+              onFinish={handleFinishGame}
+              gameSettings={gameSettings}
+              onMainMenu={handleGoToStart}
+            />
+          }
+        />
+      </Routes>
+
       <GameCompleteModal
         isOpen={showGameComplete}
         onRestart={handleRestartGame}
