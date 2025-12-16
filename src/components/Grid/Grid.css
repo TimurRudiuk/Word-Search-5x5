@@ -1,5 +1,160 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(5, 50px);
+.grid-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.game-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.grid-row {
+  display: flex;
   gap: 8px;
+  margin-bottom: 8px;
+}
+
+.game-controls {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.selected-sequence {
+  font-size: 18px;
+  margin-bottom: 15px;
+  min-height: 30px;
+  padding: 10px;
+  background: white;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+}
+
+.sequence-letter {
+  font-weight: bold;
+  color: #ff9800;
+  margin: 0 5px;
+}
+
+.empty-sequence {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.clear-button:hover {
+  background-color: #e0a800;
+}
+
+.reset-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.reset-button:hover {
+  background-color: #45a049;
+}
+
+.words-section {
+  display: flex;
+  justify-content: space-around;
+  margin: 30px 0;
+  gap: 40px;
+}
+
+.words-to-find, .found-words {
+  flex: 1;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.words-to-find h3, .found-words h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.words-to-find ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.words-to-find li {
+  padding: 10px 15px;
+  background: white;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: all 0.3s;
+  border: 2px solid #ddd;
+}
+
+.words-to-find li.found {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.found-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.found-badge {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.no-found {
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 15px;
+}
+
+.instructions {
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.instructions ol {
+  margin: 10px 0 0 20px;
+  padding: 0;
+}
+
+.instructions li {
+  margin-bottom: 5px;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
 }

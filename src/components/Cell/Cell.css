@@ -1,9 +1,113 @@
 .cell {
-  width: 50px;
-  height: 50px;
-  border: 1px solid black;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+  position: relative;
+  border: 2px solid #ddd;
+}
+
+.cell:hover {
+  transform: scale(1.05);
+  z-index: 1;
+}
+
+.cell.word-cell {
+  background-color: #e8f4fd;
+  border-color: #b8daff;
+}
+
+.cell.word-cell .cell-letter {
+  color: #0c5460;
+  font-weight: 800;
+}
+
+.cell.filler-cell {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.cell.filler-cell .cell-letter {
+  color: #6c757d;
+  font-weight: normal;
+}
+
+.cell.selected {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+}
+
+.cell.selected .cell-letter {
+  color: #856404;
+}
+
+.cell.last-selected {
+  background-color: #ffc107;
+  border-color: #ff9800;
+}
+
+.cell.last-selected .cell-letter {
+  color: #333;
+  font-weight: 900;
+}
+
+.cell.found {
+  background-color: #4CAF50;
+  border-color: #388e3c;
+}
+
+.cell.found .cell-letter {
+  color: white;
+}
+
+.cell-order {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: #ff9800;
+  color: white;
+  font-size: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  z-index: 2;
+}
+
+.cell.found .cell-order {
+  display: none;
+}
+
+.word-indicator {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  background-color: #17a2b8;
+  border-radius: 50%;
+}
+
+.cell.selected .word-indicator,
+.cell.found .word-indicator {
+  display: none;
+}
+
+.cell.filler-cell.found {
+  cursor: default;
+}
+
+.cell.filler-cell:not(.found):hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
 }

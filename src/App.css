@@ -1,21 +1,21 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 32px; 
   text-align: center;
 }
 
 .logo {
-  height: 96px;
-  padding: 24px;
+  height: 96px; 
+  padding: 24px; 
   will-change: filter;
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 32px #646cffaa);
+  filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 32px #61dafbaa);
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
@@ -34,7 +34,7 @@
 }
 
 .card {
-  padding: 32px;
+  padding: 32px; 
 }
 
 .read-the-docs {
