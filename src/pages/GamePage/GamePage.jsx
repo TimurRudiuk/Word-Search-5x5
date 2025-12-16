@@ -1,21 +1,32 @@
-import Grid from "../../components/Grid/Grid";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-function GamePage({ onFinish, gameSettings, onMainMenu }) {
+import Grid from "../../components/Grid/Grid";
+import { addResult } from "../../store/resultsSlice";
+
+function GamePage({ onMainMenu }) {
   const { userId } = useParams();
+  const dispatch = useDispatch();
+
+  const gameSettings = useSelector((state) => state.settings);
 
   const handleGameComplete = (results) => {
-    onFinish(results);
+    dispatch(
+      addResult({
+        ...results,
+        userId: Number(userId),
+        gridSize: gameSettings.gridSize,
+        wordCount: gameSettings.wordCount,
+        createdAt: new Date().toISOString()
+      })
+    );
   };
 
-  const gridKey = gameSettings
-    ? `${gameSettings.gridSize}-${gameSettings.wordCount}`
-    : "default";
+  const gridKey = `${gameSettings.gridSize}-${gameSettings.wordCount}`;
 
   return (
     <div className="page">
       <div className="game-container">
-
         <Grid
           key={gridKey}
           onComplete={handleGameComplete}

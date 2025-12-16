@@ -1,51 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import Button from "../../components/Button/Button";
 import GameSettings from "../../components/GameSettings/GameSettings";
+
+import { updateSettings, resetSettings } from "../../store/settingsSlice";
+
 import "./StartPage.css";
 
 function StartPage({ onStart }) {
-  const [showSettings, setShowSettings] = useState(false);
-  const [gameSettings, setGameSettings] = useState({
-    gridSize: 5,
-    wordCount: 6
-  });
+  const dispatch = useDispatch();
+  const gameSettings = useSelector((state) => state.settings);
 
-  useEffect(() => {
-    const savedSettings = localStorage.getItem("wordSearchSettings");
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings);
-        setGameSettings(parsedSettings);
-      } catch (error) {
-        console.error("Error loading settings:", error);
-      }
-    }
-  }, []);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleStartGame = () => {
-    localStorage.setItem("wordSearchSettings", JSON.stringify(gameSettings));
-    onStart(gameSettings);
+    onStart();
   };
 
   const handleSaveSettings = (newSettings) => {
-    setGameSettings(newSettings);
-    localStorage.setItem("wordSearchSettings", JSON.stringify(newSettings));
+    dispatch(updateSettings(newSettings));
   };
 
   const handleResetToDefault = () => {
-    const defaultSettings = {
-      gridSize: 5,
-      wordCount: 6
-    };
-    setGameSettings(defaultSettings);
-    localStorage.removeItem("wordSearchSettings");
+    dispatch(resetSettings());
   };
 
   return (
     <div className="start-page">
       <div className="start-container">
         <h1>Word Search Game</h1>
-        
+
         <div className="game-description">
           <h2>How to play?</h2>
           <ol className="instructions">
@@ -62,7 +47,9 @@ function StartPage({ onStart }) {
           <div className="settings-summary">
             <div className="setting-item">
               <span className="setting-label">Grid Size:</span>
-              <span className="setting-value">{gameSettings.gridSize}×{gameSettings.gridSize}</span>
+              <span className="setting-value">
+                {gameSettings.gridSize}×{gameSettings.gridSize}
+              </span>
             </div>
             <div className="setting-item">
               <span className="setting-label">Words to Find:</span>
@@ -72,17 +59,19 @@ function StartPage({ onStart }) {
         </div>
 
         <div className="start-button-container">
-          <Button 
-            text="Start Game" 
-            onClick={handleStartGame} 
-            primary 
-            size="large"
-          />
+          <Button text="Start Game" onClick={handleStartGame} primary size="large" />
+
           <div className="settings-buttons">
-            <Button 
-              text="Change Settings" 
-              onClick={() => setShowSettings(true)} 
+            <Button
+              text="Change Settings"
+              onClick={() => setShowSettings(true)}
               secondary
+              size="medium"
+            />
+            <Button
+              text="Reset Default"
+              onClick={handleResetToDefault}
+              warning
               size="medium"
             />
           </div>

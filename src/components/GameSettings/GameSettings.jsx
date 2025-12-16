@@ -5,66 +5,60 @@ import Button from "../Button/Button";
 import "./GameSettings.css";
 
 const MAX_WORDS_BY_GRID_SIZE = {
-  4: 5,  
-  5: 7,   
-  6: 9, 
+  4: 5,
+  5: 7,
+  6: 9,
   7: 12,
-  8: 15 
+  8: 15
 };
 
 function GameSettings({ isOpen, onClose, onSave, initialSettings }) {
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch
+  } = useForm({
     defaultValues: initialSettings
   });
 
   const gridSize = watch("gridSize");
-  const wordCount = watch("wordCount");
 
   useEffect(() => {
-    if (isOpen) {
-      reset(initialSettings);
-    }
+    if (isOpen) reset(initialSettings);
   }, [isOpen, initialSettings, reset]);
+
+  const getMaxWords = () => MAX_WORDS_BY_GRID_SIZE[gridSize] || 15;
+  const getMinWords = () => 3;
+
+  const getWordCountOptions = () => {
+    const maxWords = getMaxWords();
+    const minWords = getMinWords();
+    const options = [];
+
+    for (let i = minWords; i <= maxWords; i++) {
+      options.push(
+        <option key={i} value={i}>
+          {i} {i === 1 ? "word" : "words"}
+        </option>
+      );
+    }
+
+    return options;
+  };
 
   const onSubmit = (data) => {
     const settings = {
       gridSize: Number(data.gridSize),
       wordCount: Number(data.wordCount)
     };
-    onSave(settings);
+    onSave(settings); 
     onClose();
   };
 
   const handleResetToDefault = () => {
-    const defaultSettings = {
-      gridSize: 5,
-      wordCount: 6
-    };
-    reset(defaultSettings);
-  };
-
-  const getMaxWords = () => {
-    return MAX_WORDS_BY_GRID_SIZE[gridSize] || 15;
-  };
-
-  const getMinWords = () => {
-    return 3;
-  };
-
-  const getWordCountOptions = () => {
-    const maxWords = getMaxWords();
-    const minWords = getMinWords();
-    const options = [];
-    
-    for (let i = minWords; i <= maxWords; i++) {
-      options.push(
-        <option key={i} value={i}>
-          {i} {i === 1 ? 'word' : 'words'}
-        </option>
-      );
-    }
-    
-    return options;
+    reset({ gridSize: 5, wordCount: 6 });
   };
 
   if (!isOpen) return null;
@@ -74,15 +68,17 @@ function GameSettings({ isOpen, onClose, onSave, initialSettings }) {
       <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
         <div className="settings-header">
           <h2>Game Settings</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
-        
+
         <form className="settings-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="form-group">
             <label htmlFor="gridSize">Grid Size</label>
-            <select 
+            <select
               id="gridSize"
-              {...register("gridSize", { 
+              {...register("gridSize", {
                 required: "Grid size is required",
                 valueAsNumber: true
               })}
@@ -97,12 +93,10 @@ function GameSettings({ isOpen, onClose, onSave, initialSettings }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="wordCount">
-              Number of Words (max {getMaxWords()})
-            </label>
-            <select 
+            <label htmlFor="wordCount">Number of Words (max {getMaxWords()})</label>
+            <select
               id="wordCount"
-              {...register("wordCount", { 
+              {...register("wordCount", {
                 required: "Number of words is required",
                 valueAsNumber: true,
                 min: {
@@ -125,25 +119,16 @@ function GameSettings({ isOpen, onClose, onSave, initialSettings }) {
 
           <div className="form-actions">
             <div className="form-actions-left">
-              <Button 
-                text="Reset to Default" 
-                onClick={handleResetToDefault} 
+              <Button
+                text="Reset to Default"
+                onClick={handleResetToDefault}
                 warning
                 type="button"
               />
             </div>
             <div className="form-actions-right">
-              <Button 
-                text="Cancel" 
-                onClick={onClose} 
-                secondary
-                type="button"
-              />
-              <Button 
-                text="Save Settings" 
-                type="submit"
-                primary
-              />
+              <Button text="Cancel" onClick={onClose} secondary type="button" />
+              <Button text="Save Settings" type="submit" primary />
             </div>
           </div>
         </form>
