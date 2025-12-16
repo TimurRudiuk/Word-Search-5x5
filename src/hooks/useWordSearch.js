@@ -1,42 +1,46 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-const GRID_SIZE = 5;
 const DIRECTIONS = [
   [0, 1],   
-  [1, 0], 
+  [1, 0],   
   [1, 1],   
   [1, -1],  
   [0, -1],  
   [-1, 0],  
-  [-1, 1], 
+  [-1, 1],  
   [-1, -1], 
 ];
 
-function generateGrid(words) {
-  const grid = Array(GRID_SIZE).fill(null).map(() => 
-    Array(GRID_SIZE).fill("")
+const WORD_POOL = [
+  "CAT", "DOG", "SUN", "MOON", "STAR", "FISH", "BIRD", "TREE", "BOOK", "BALL",
+  "HOUSE", "WATER", "APPLE", "HAPPY", "GREEN", "BLUE", "RED", "FUN", "GAME", "WEB",
+  "CODE", "JAVA", "LOVE", "TIME", "FIRE", "SNOW", "RAIN", "WIND", "CLOUD", "BEACH"
+];
+
+function generateGrid(gridSize, wordCount) {
+  console.log(`Generating ${gridSize}x${gridSize} grid with ${wordCount} words`);
+  
+  const grid = Array(gridSize).fill(null).map(() => 
+    Array(gridSize).fill("")
   );
   
   const placedWords = [];
   const usedCells = new Set();
-  const availableCells = new Set();
-
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
-      availableCells.add(`${row},${col}`);
-    }
-  }
 
   const canPlaceWord = (word, startRow, startCol, direction) => {
     const positions = [];
+    const wordLength = word.length;
     
-    for (let i = 0; i < word.length; i++) {
+    const endRow = startRow + direction[0] * (wordLength - 1);
+    const endCol = startCol + direction[1] * (wordLength - 1);
+    
+    if (endRow < 0 || endRow >= gridSize || endCol < 0 || endCol >= gridSize) {
+      return null;
+    }
+    
+    for (let i = 0; i < wordLength; i++) {
       const row = startRow + direction[0] * i;
       const col = startCol + direction[1] * i;
-
-      if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) {
-        return null;
-      }
 
       const cellKey = `${row},${col}`;
       
@@ -54,8 +58,8 @@ function generateGrid(words) {
     const positions = [];
     const wordLength = word.length;
     
-    for (let startRow = 0; startRow < GRID_SIZE; startRow++) {
-      for (let startCol = 0; startCol < GRID_SIZE; startCol++) {
+    for (let startRow = 0; startRow < gridSize; startRow++) {
+      for (let startCol = 0; startCol < gridSize; startCol++) {
         for (const direction of DIRECTIONS) {
           const placedPositions = canPlaceWord(word, startRow, startCol, direction);
           if (placedPositions) {
@@ -73,9 +77,17 @@ function generateGrid(words) {
     return positions;
   };
 
-  const sortedWords = [...words]
-    .map(wordObj => wordObj.word.toUpperCase())
-    .sort((a, b) => b.length - a.length);
+  const getRandomWords = () => {
+    const maxWordLength = Math.min(gridSize, 8);
+    const suitableWords = WORD_POOL.filter(word => word.length <= maxWordLength);
+    
+    const shuffled = [...suitableWords].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, wordCount).map(word => word.toUpperCase());
+  };
+
+  const wordsToPlace = getRandomWords();
+  
+  const sortedWords = [...wordsToPlace].sort((a, b) => b.length - a.length);
 
   sortedWords.forEach(word => {
     const possiblePositions = findPossiblePositions(word);
@@ -87,7 +99,6 @@ function generateGrid(words) {
       positions.forEach(([row, col], index) => {
         grid[row][col] = word[index];
         usedCells.add(`${row},${col}`);
-        availableCells.delete(`${row},${col}`);
       });
 
       placedWords.push({
@@ -99,11 +110,14 @@ function generateGrid(words) {
   });
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  availableCells.forEach(cellKey => {
-    const [row, col] = cellKey.split(",").map(Number);
-    const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
-    grid[row][col] = randomLetter;
-  });
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      if (grid[row][col] === "") {
+        const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+        grid[row][col] = randomLetter;
+      }
+    }
+  }
 
   return { grid, placedWords };
 }
@@ -154,33 +168,35 @@ const areCellsConsecutiveInLine = (sequence) => {
   return isForwardConsecutive || isReverseConsecutive;
 };
 
-export function useWordSearch(onComplete) {
-  const words = [
-    { word: "CAT" },
-    { word: "DOG" },
-    { word: "JAVA" },
-    { word: "CODE" },
-    { word: "GAME" },
-    { word: "FUN" },
-    { word: "WEB" },
-    { word: "APP" },
-    { word: "HI" }
-  ];
+export function useWordSearch(onComplete, gameSettings) {
+  console.log("useWordSearch called with:", gameSettings);
+  
+  const settings = gameSettings || {
+    gridSize: 5,
+    wordCount: 6
+  };
 
   const gridDataRef = useRef(null);
   
-  if (!gridDataRef.current) {
-    gridDataRef.current = generateGrid(words);
+  if (!gridDataRef.current || 
+      gridDataRef.current.gridSize !== settings.gridSize || 
+      gridDataRef.current.wordCount !== settings.wordCount) {
+    console.log("Creating new grid data");
+    gridDataRef.current = {
+      ...generateGrid(settings.gridSize, settings.wordCount),
+      gridSize: settings.gridSize,
+      wordCount: settings.wordCount
+    };
   }
 
   const { grid: initialGrid, placedWords } = gridDataRef.current;
 
   const [selectedSequence, setSelectedSequence] = useState([]);
   const [selectedCells, setSelectedCells] = useState(() => 
-    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
+    Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false))
   );
   const [foundCells, setFoundCells] = useState(() => 
-    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false))
+    Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false))
   );
   const [foundWords, setFoundWords] = useState([]);
   const [selectedDirection, setSelectedDirection] = useState(null);
@@ -229,10 +245,10 @@ export function useWordSearch(onComplete) {
 
         setSelectedSequence([]);
         setSelectedDirection(null);
-        setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+        setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
       }
     });
-  }, [foundWords, placedWords, onComplete]);
+  }, [foundWords, placedWords, onComplete, settings.gridSize]);
 
   const handleClick = useCallback((row, col) => {
     if (foundCells[row][col]) return;
@@ -273,7 +289,7 @@ export function useWordSearch(onComplete) {
     if (Math.abs(rowDiff) > 1 || Math.abs(colDiff) > 1) {
       setSelectedSequence([[row, col]]);
       setSelectedDirection(null);
-      setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+      setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
       setSelectedCells(prev => {
         const newSelected = [...prev.map(r => [...r])];
         newSelected[row][col] = true;
@@ -295,7 +311,7 @@ export function useWordSearch(onComplete) {
            direction[1] !== selectedDirection[1])) {
         setSelectedSequence([[row, col]]);
         setSelectedDirection(null);
-        setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+        setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
         setSelectedCells(prev => {
           const newSelected = [...prev.map(r => [...r])];
           newSelected[row][col] = true;
@@ -311,7 +327,7 @@ export function useWordSearch(onComplete) {
     if (row !== expectedRow || col !== expectedCol) {
       setSelectedSequence([[row, col]]);
       setSelectedDirection(null);
-      setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+      setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
       setSelectedCells(prev => {
         const newSelected = [...prev.map(r => [...r])];
         newSelected[row][col] = true;
@@ -326,7 +342,7 @@ export function useWordSearch(onComplete) {
       newSelected[row][col] = true;
       return newSelected;
     });
-  }, [foundCells, selectedSequence, selectedDirection]);
+  }, [foundCells, selectedSequence, selectedDirection, settings.gridSize]);
 
   useEffect(() => {
     checkWords(selectedSequence);
@@ -348,24 +364,28 @@ export function useWordSearch(onComplete) {
   }, [selectedSequence]);
 
   const handleReset = useCallback(() => {
-    gridDataRef.current = generateGrid(words);
+    gridDataRef.current = {
+      ...generateGrid(settings.gridSize, settings.wordCount),
+      gridSize: settings.gridSize,
+      wordCount: settings.wordCount
+    };
     setSelectedSequence([]);
     setSelectedDirection(null);
-    setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
-    setFoundCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
+    setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
+    setFoundCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
     setFoundWords([]);
-  }, [words]);
+  }, [settings.gridSize, settings.wordCount]);
 
   const handleClear = useCallback(() => {
     setSelectedSequence([]);
     setSelectedDirection(null);
-    setSelectedCells(Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false)));
-  }, []);
+    setSelectedCells(Array(settings.gridSize).fill(null).map(() => Array(settings.gridSize).fill(false)));
+  }, [settings.gridSize]);
 
   return {
     initialGrid,
     placedWords,
-    selectedCells: isCellSelected,
+    selectedCells: isCellSelected, 
     foundCells,
     isCellLastSelected,
     getCellOrder,
@@ -376,6 +396,6 @@ export function useWordSearch(onComplete) {
     handleReset,
     handleClear,
     selectedSequence,
-    gridSize: GRID_SIZE
+    gridSize: settings.gridSize
   };
 }
